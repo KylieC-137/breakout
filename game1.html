@@ -21,6 +21,7 @@
 	var canvas = document.getElementById("myCanvas");
 	var ctx = canvas.getContext("2d");
 
+	var lives = 3;
 	//x, y limits for the ball
 	var x =  canvas.width/2;
 	var y =  canvas.height - 30;
@@ -112,6 +113,12 @@
 		ctx.fillText("Score: " + score, 8, 20);
 	}
 
+	function drawLives() {
+		ctx.font = "16px Arial";
+		ctx.fillStyle = "#0095DD";
+		ctx.fillText("Lives: " + lives, 108, 20);
+	}
+
 	function drawBall() {
     	ctx.beginPath();
     	ctx.arc(x, y, ballRadius, 0, Math.PI*2);
@@ -155,6 +162,7 @@
 	    drawBricks();
 	    collisionDetection();
 	    drawScore();
+	    drawLives();
 	    x += dx;
 	    y += dy;
 	    if(x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
@@ -166,10 +174,14 @@
 	    	if(x>paddleX && x < paddleX + paddleWidth){
 	    		dy = -dy
 	    	}
-	    	else{
-	    		alert("GAME OVER");
-	    		document.location.reload();
-	    		clearInterval(interval);
+	    	else {
+	    		lives = lives -1;
+	    		dy = -dy
+	    		if(lives <= 0){
+	    			alert("GAME OVER" + "\n" + score + " Points");
+	    			document.location.reload();
+	    			clearInterval(interval);
+	    		}
 	    	}
 	    }
 	    if(rightPressed && paddleX < canvas.width - paddleWidth){
