@@ -2,22 +2,50 @@
 <html>
 
 <!--Add Easy/Med/Hard Levels -->
-<!--html button with val 0-3, js if(x=0){paddle width = 20 or 15 or 10 or something} -->
+<!--html button with val 0-3, js if(x=0){paddle width = 20 or 15 or 10 or something}  and speed changes (dy and dx) -->
 
 
 <head>
     <meta charset="utf-8" />
     <title>Gamedev Canvas Workshop</title>
+    <script type="text/javascript">
+    var dx = 2;
+	var dy = -2;
+	var speed = 1;
+	var paddleWidth = 75;
+
+	function increaseLevel(){
+		dx = Math.abs(dx) +2;
+		dy = Math.abs(dy) + 2;
+		paddleWidth = paddleWidth +8;
+		speed++;
+		lives=3;
+	}
+    </script>
     <style>
     	* { padding: 0; margin: 0; }
     	canvas { background: #eee; display: block; margin: 0 auto; }
+    	.btn {
+ 			background-color: green;
+			border: none;
+			color: white;
+			padding: 20px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 12px;
+			position: fixed;
+}
     </style>
 </head>
 <body>
-
-<canvas id="myCanvas" width="480" height="320"></canvas>
+	<canvas id="myCanvas" width="480" height="320"></canvas>
+	<button class="btn" style="margin-left: 45%;">Easy</button>
+	<button class="btn" onclick="increaseLevel()" style="margin-left: 52%;">Harder</button>
 
 <script>
+
+
 	var canvas = document.getElementById("myCanvas");
 	var ctx = canvas.getContext("2d");
 
@@ -26,14 +54,11 @@
 	var x =  canvas.width/2;
 	var y =  canvas.height - 30;
 
-	var dx = 2;
-	var dy = -2;
 
 	var ballRadius = 10;
 
 	//paddle definitions
 	var paddleHeight = 10;
-	var paddleWidth = 75;
 	var paddleX = (canvas.width - paddleWidth)/2;
 
 	var rightPressed = false;
@@ -99,7 +124,7 @@
 					b.status = 0;
 					score++;
 					if(score == brickRowCount*brickColumnCount){
-						alert("You win with " + score + " points");
+						alert("You win with " + score*speed + " points");
 						document.location.reload();
 					}
 				}}
@@ -111,6 +136,12 @@
 		ctx.font = "16px Arial";
 		ctx.fillStyle = "#0095DD";
 		ctx.fillText("Score: " + score, 8, 20);
+	}
+
+	function drawSpeed() {
+		ctx.font = "16px Arial";
+		ctx.fillStyle = "#0095DD";
+		ctx.fillText("Speed: " + speed, 208, 20)
 	}
 
 	function drawLives() {
@@ -163,6 +194,7 @@
 	    collisionDetection();
 	    drawScore();
 	    drawLives();
+	    drawSpeed();
 	    x += dx;
 	    y += dy;
 	    if(x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
@@ -177,8 +209,13 @@
 	    	else {
 	    		lives = lives -1;
 	    		dy = -dy
+	    		ctx.beginPath();
+    			ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+   				ctx.fillStyle = "#FF0000";
+    			ctx.fill();
+    			ctx.closePath();
 	    		if(lives <= 0){
-	    			alert("GAME OVER" + "\n" + score + " Points");
+	    			alert("GAME OVER" + "\n" + score*speed + " Points");
 	    			document.location.reload();
 	    			clearInterval(interval);
 	    		}
@@ -190,13 +227,14 @@
 	    else if (leftPressed && paddleX > 0){
 	    	paddleX -= 7;
 	    }
+	    requestAnimationFrame(draw);
 	}
 
 	document.addEventListener("keydown", keyDownHandler, false);
 	document.addEventListener("keyup", keyUpHandler, false);
 
 
-	var interval = setInterval(draw, 10);
+	draw();
 </script>
 
 </body>
